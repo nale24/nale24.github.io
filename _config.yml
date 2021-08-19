@@ -16,12 +16,12 @@ minimal: false             # use a dark header
 
 # Menu
 
-navigation:                # accepts {file, title, url, icon, sidebaricon}
-  - {file: "index.html", title: "Home"} 
+navigation:                # accepts {file, title, url, icon, sidebaricon} 
   - {file: "About.md", title: "About me"}
   - {file: "NaLe.pdf", title: "Resume"}
-  #- {file: "/blog.md", title: "Blog"}
-  # - {title: "Projects", url: ""}
+  - {title: "Projects", url: ""}
+  - {file: "index.html", title: "Blog"}
+
 
 external:                  # shows a footer with social links - for available icons see fontawesome.com/icons
   - {title: Mail, icon: envelope, url: "mailto:nale@vt.edu"}
