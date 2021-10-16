@@ -18,7 +18,8 @@ minimal: false             # use a dark header
 
 navigation:                # accepts {file, title, url, icon, sidebaricon} 
   - {file: "About.md", title: "About me"}
-  - {url: "https://github.com/nale24/nale24.github.io/blob/master/NaLe.pdf", title: "Resume"}
+  #- {url: "https://github.com/nale24/nale24.github.io/blob/master/NaLe.pdf", title: "Resume"}
+  - {file: "NaLe_Resume.pdf", title: "Resume"}
   - {title: "Projects", url: ""}
   - {file: "index.html", title: "Blog"}
 
