@@ -3,6 +3,10 @@ const input = document.getElementById('command-input');
 let commandHistory = [];
 let historyIndex = -1;
 
+// Navigation history to track pages
+let navigationHistory = [];
+let currentPage = 'welcome';
+
 // Data will be loaded from JSON files
 let projects = [];
 let content = {};
@@ -14,9 +18,13 @@ async function loadData() {
         const projectsResponse = await fetch('data/projects.json');
         projects = await projectsResponse.json();
 
+        console.log('Projects loaded:', projects); // Debug line
+
         // Load content
         const contentResponse = await fetch('data/content.json');
         content = await contentResponse.json();
+
+        console.log('Content loaded:', content); // Debug line
 
         // Initialize terminal after data is loaded
         showWelcome();
@@ -29,18 +37,21 @@ async function loadData() {
 // Available commands
 const commands = {
     help: () => {
+        addToNavigationHistory('help');
         return `
 ╔════════════════════════════════════════════════════════════╗
 ║                    AVAILABLE COMMANDS                      ║
 ╚════════════════════════════════════════════════════════════╝
 
-  about      - Learn more about me and my background \n
-  timeline   - View my education and work experience \n
-  skills     - See my technical skills and expertise \n
-  projects   - Browse my portfolio projects \n
-  contact    - Get my contact information \n
-  clear      - Clear the terminal screen \n
-  help       - Show this help message \n
+  about      - Learn more about me and my background
+  timeline   - View my education and work experience
+  skills     - See my technical skills and expertise
+  projects   - Browse my portfolio projects
+  contact    - Get my contact information
+  clear      - Clear the terminal screen
+  back       - Go back to the previous page
+  home       - Return to the welcome screen
+  help       - Show this help message
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -48,17 +59,33 @@ const commands = {
         `;
     },
 
-    about: () => content.about || 'Content not loaded yet.',
-    timeline: () => content.timeline || 'Content not loaded yet.',
-    skills: () => content.skills || 'Content not loaded yet.',
-    contact: () => content.contact || 'Content not loaded yet.',
+    about: () => {
+        addToNavigationHistory('about');
+        return content.about || 'Content not loaded yet. Make sure you are running a local server.';
+    },
+
+    timeline: () => {
+        addToNavigationHistory('timeline');
+        return content.timeline || 'Content not loaded yet. Make sure you are running a local server.';
+    },
+
+    skills: () => {
+        addToNavigationHistory('skills');
+        return content.skills || 'Content not loaded yet. Make sure you are running a local server.';
+    },
+
+    contact: () => {
+        addToNavigationHistory('contact');
+        return content.contact || 'Content not loaded yet. Make sure you are running a local server.';
+    },
 
     projects: () => {
+        addToNavigationHistory('projects');
         if (projects.length === 0) {
-            return 'Projects not loaded yet.';
+            return 'Projects not loaded yet. Make sure you are running a local server.';
         }
 
-        let output = `
+        let projectOutput = `
 ╔════════════════════════════════════════════════════════════╗
 ║                      MY PROJECTS                           ║
 ╚════════════════════════════════════════════════════════════╝
@@ -68,19 +95,52 @@ Select a project number to view details:
 `;
 
         projects.forEach(project => {
-            output += `[${project.id}] ${project.title}\n`;
-            output += `    ${project.category} | ${project.tech}\n`;
-            output += `    ${project.description}\n\n`;
+            projectOutput += `[${project.id}] ${project.title}\n`;
+            projectOutput += `    ${project.category} | ${project.tech}\n`;
+            projectOutput += `    ${project.description}\n\n`;
         });
 
-        output += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-        output += `💡 Type a number (1-${projects.length}) to view project details`;
+        projectOutput += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+        projectOutput += `💡 Type a number (1-${projects.length}) to view project details`;
 
-        return output;
+        return projectOutput;
     },
 
     clear: () => {
         output.innerHTML = '';
+        return '';
+    },
+
+    back: () => {
+        if (navigationHistory.length <= 1) {
+            return 'No previous page to go back to. Type "home" to return to welcome screen.';
+        }
+
+        // Remove current page
+        navigationHistory.pop();
+
+        // Get previous page
+        const previousPage = navigationHistory[navigationHistory.length - 1];
+
+        // Execute the previous command without adding to history again
+        if (commands[previousPage]) {
+            // Temporarily remove from history to avoid double-adding
+            const lastItem = navigationHistory.pop();
+            const result = commands[previousPage]();
+            navigationHistory.push(lastItem);
+            return result;
+        } else if (previousPage === 'welcome') {
+            showWelcome();
+            return '';
+        }
+
+        return 'Error navigating back.';
+    },
+
+    home: () => {
+        // Clear navigation history and go to welcome
+        navigationHistory = ['welcome'];
+        showWelcome();
         return '';
     }
 };
@@ -89,6 +149,12 @@ Select a project number to view details:
 function isProjectNumber(input) {
     const num = parseInt(input);
     return !isNaN(num) && num >= 1 && num <= projects.length;
+}
+
+// Add page to navigation history
+function addToNavigationHistory(page) {
+    navigationHistory.push(page);
+    currentPage = page;
 }
 
 // Navigate to project page
@@ -107,6 +173,8 @@ function navigateToProject(projectId) {
 
 // Welcome message
 function showWelcome() {
+    currentPage = 'welcome';
+    navigationHistory = ['welcome']; // Reset navigation when showing welcome
     const welcome = `
 ╔════════════════════════════════════════════════════════════╗
 ║                                                            ║
@@ -124,7 +192,10 @@ Type 'help' to see available commands.
 function addOutput(text, className = '') {
     const line = document.createElement('div');
     line.className = `output-line ${className}`;
-    line.textContent = text;
+    // Use innerText to preserve line breaks and whitespace
+    line.innerText = text;
+    // Make sure white-space is preserved in CSS
+    line.style.whiteSpace = 'pre-wrap';
     output.appendChild(line);
     output.scrollTop = output.scrollHeight;
 }
@@ -133,13 +204,16 @@ function addOutput(text, className = '') {
 function processCommand(cmd) {
     const trimmedCmd = cmd.trim();
 
-    // Echo command
-    addOutput(`visitor@portfolio:~$ ${cmd}`, 'command-echo');
-
     // Handle empty command
     if (trimmedCmd === '') {
         return;
     }
+
+    // Clear previous output before showing new command
+    output.innerHTML = '';
+
+    // Echo command
+    addOutput(`visitor@portfolio:~$ ${cmd}`, 'command-echo');
 
     // Add to history
     commandHistory.unshift(trimmedCmd);

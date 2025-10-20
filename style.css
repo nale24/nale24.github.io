@@ -32,6 +32,12 @@ body {
     min-height: 400px;
 }
 
+.output-line {
+    margin: 8px 0;
+    line-height: 1.6;
+    white-space: pre-wrap; /* This is critical! */
+}
+
 .input-line {
     display: flex;
     align-items: center;
