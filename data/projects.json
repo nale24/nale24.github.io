@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "title": "Math with Le",
+    "category": "Full-Stack Development",
+    "tech": "Python, Django, JavaScript, HTML/CSS, NLP",
+    "description": "Full-stack tutoring website with AI-powered question analysis",
+    "page": "projects/project-1.html"
+  },
+  {
+    "id": 2,
+    "title": "Crime Mapper",
+    "category": "Data Analytics",
+    "tech": "Python, ArcGIS, Manifold, XGBoost",
+    "description": "Crime prediction system with safe route recommendations",
+    "page": "projects/project-2.html"
+  },
+  {
+    "id": 3,
+    "title": "Sentiment Analysis System",
+    "category": "Machine Learning",
+    "tech": "Python, VADER, NLTK, Random Forest",
+    "description": "Sentiment analysis achieving 80% accuracy for decision-making",
+    "page": "projects/project-3.html"
+  },
+  {
+    "id": 4,
+    "title": "Data Pipeline Optimization",
+    "category": "Data Engineering",
+    "tech": "Python, SQL, ETL",
+    "description": "Improved data accessibility by 19% and reduced runtime by 17%",
+    "page": "projects/project-4.html"
+  },
+  {
+    "id": 5,
+    "title": "Bias Detection in Text Evaluation",
+    "category": "NLP & Machine Learning",
+    "tech": "Python, TF-IDF, BERT, Word Embeddings",
+    "description": "Reduced evaluation bias by 19% using advanced NLP techniques",
+    "page": "projects/project-5.html"
+  }
+]

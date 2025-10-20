@@ -1,76 +1,83 @@
 const output = document.getElementById('output');
 const input = document.getElementById('command-input');
+let commandHistory = [];
+let historyIndex = -1;
 
-// Your content data
-const content = {
-    about: `
-Hi! I'm [Your Name], a data analyst and software developer.
+// Data will be loaded from JSON files
+let projects = [];
+let content = {};
 
-I specialize in turning data into actionable insights and building 
-efficient software solutions. I love working with Python, SQL, and 
-modern web technologies.
+// Load data from JSON files
+async function loadData() {
+    try {
+        // Load projects
+        const projectsResponse = await fetch('data/projects.json');
+        projects = await projectsResponse.json();
 
-Skills: Python | SQL | JavaScript | Data Visualization | React
-    `,
+        // Load content
+        const contentResponse = await fetch('data/content.json');
+        content = await contentResponse.json();
 
-    projects: `
-=== Data Analytics Projects ===
-1. Sales Dashboard - Interactive Power BI dashboard
-2. Customer Segmentation - Python clustering analysis
-3. Predictive Model - ML model for forecasting
-
-=== Software Development Projects ===
-1. Task Manager API - RESTful API with Node.js
-2. Weather App - React + OpenWeather API
-3. E-commerce Site - Full-stack MERN project
-
-Type 'project [number]' for details (e.g., 'project 1')
-    `,
-
-    resume: `
-=== Education ===
-- BS in Computer Science - University Name (2020-2024)
-- Data Analytics Bootcamp - Platform Name (2023)
-
-=== Experience ===
-- Junior Developer @ Company (2024-Present)
-  - Built data pipelines processing 1M+ records
-  - Developed customer analytics dashboard
-
-=== Skills ===
-Languages: Python, JavaScript, SQL, R
-Tools: Git, Docker, Tableau, Power BI
-Frameworks: React, Node.js, Django
-    `,
-
-    contact: `
-📧 Email: your.email@example.com
-💼 LinkedIn: linkedin.com/in/yourprofile
-🐙 GitHub: github.com/yourusername
-📄 Resume: [Download PDF link]
-    `
-};
+        // Initialize terminal after data is loaded
+        showWelcome();
+    } catch (error) {
+        console.error('Error loading data:', error);
+        addOutput('Error loading portfolio data. Please refresh the page.', 'error');
+    }
+}
 
 // Available commands
 const commands = {
     help: () => {
         return `
-Available commands:
-  help      - Show this help message
-  about     - Learn about me
-  projects  - View my projects
-  resume    - See my education & experience
-  contact   - Get my contact information
-  clear     - Clear the terminal
-  
-Type any command and press Enter!
+╔════════════════════════════════════════════════════════════╗
+║                    AVAILABLE COMMANDS                      ║
+╚════════════════════════════════════════════════════════════╝
+
+  about      - Learn more about me and my background
+  timeline   - View my education and work experience
+  skills     - See my technical skills and expertise
+  projects   - Browse my portfolio projects
+  contact    - Get my contact information
+  clear      - Clear the terminal screen
+  help       - Show this help message
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 Tip: Type any command and press Enter to get started!
         `;
     },
 
-    about: () => content.about,
-    projects: () => content.projects,
-    resume: () => content.resume,
-    contact: () => content.contact,
+    about: () => content.about || 'Content not loaded yet.',
+    timeline: () => content.timeline || 'Content not loaded yet.',
+    skills: () => content.skills || 'Content not loaded yet.',
+    contact: () => content.contact || 'Content not loaded yet.',
+
+    projects: () => {
+        if (projects.length === 0) {
+            return 'Projects not loaded yet.';
+        }
+
+        let output = `
+╔════════════════════════════════════════════════════════════╗
+║                      MY PROJECTS                           ║
+╚════════════════════════════════════════════════════════════╝
+
+Select a project number to view details:
+
+`;
+
+        projects.forEach(project => {
+            output += `[${project.id}] ${project.title}\n`;
+            output += `    ${project.category} | ${project.tech}\n`;
+            output += `    ${project.description}\n\n`;
+        });
+
+        output += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+        output += `💡 Type a number (1-${projects.length}) to view project details`;
+
+        return output;
+    },
 
     clear: () => {
         output.innerHTML = '';
@@ -78,56 +85,112 @@ Type any command and press Enter!
     }
 };
 
+// Check if input is a project number
+function isProjectNumber(input) {
+    const num = parseInt(input);
+    return !isNaN(num) && num >= 1 && num <= projects.length;
+}
+
+// Navigate to project page
+function navigateToProject(projectId) {
+    const project = projects.find(p => p.id === projectId);
+    if (project) {
+        // Add a loading message before navigation
+        addOutput(`Loading ${project.title}...`, 'success');
+        setTimeout(() => {
+            window.location.href = project.page;
+        }, 500);
+        return '';
+    }
+    return `Project ${projectId} not found.`;
+}
+
 // Welcome message
 function showWelcome() {
-    output.innerHTML = `
-<div class="output-line">Welcome to my portfolio terminal!</div>
-<div class="output-line">Type 'help' to see available commands.</div>
-<div class="output-line">---</div>
-    `;
+    const welcome = `
+╔════════════════════════════════════════════════════════════╗
+║                                                            ║
+║            Welcome to Na Le's Portfolio Terminal           ║
+║                                                            ║
+╚════════════════════════════════════════════════════════════╝
+
+Type 'help' to see available commands.
+
+`;
+    addOutput(welcome, 'info');
+}
+
+// Add output to terminal
+function addOutput(text, className = '') {
+    const line = document.createElement('div');
+    line.className = `output-line ${className}`;
+    line.textContent = text;
+    output.appendChild(line);
+    output.scrollTop = output.scrollHeight;
 }
 
 // Process command
 function processCommand(cmd) {
-    const command = cmd.trim().toLowerCase();
+    const trimmedCmd = cmd.trim();
 
-    // Display the command
-    const cmdLine = document.createElement('div');
-    cmdLine.className = 'output-line command';
-    cmdLine.textContent = `visitor@portfolio:~$ ${cmd}`;
-    output.appendChild(cmdLine);
+    // Echo command
+    addOutput(`visitor@portfolio:~$ ${cmd}`, 'command-echo');
 
-    // Execute command
-    let result;
+    // Handle empty command
+    if (trimmedCmd === '') {
+        return;
+    }
+
+    // Add to history
+    commandHistory.unshift(trimmedCmd);
+    historyIndex = -1;
+
+    // Check if it's a project number
+    if (isProjectNumber(trimmedCmd)) {
+        const result = navigateToProject(parseInt(trimmedCmd));
+        if (result) addOutput(result, 'error');
+        return;
+    }
+
+    // Check if it's a valid command
+    const command = trimmedCmd.toLowerCase();
     if (commands[command]) {
-        result = commands[command]();
-    } else if (command === '') {
-        result = '';
+        const result = commands[command]();
+        if (result) addOutput(result);
     } else {
-        result = `Command not found: ${command}\nType 'help' for available commands.`;
+        addOutput(`Command not found: ${trimmedCmd}\nType 'help' for available commands.`, 'error');
     }
-
-    // Display result
-    if (result) {
-        const resultLine = document.createElement('div');
-        resultLine.className = 'output-line';
-        resultLine.textContent = result;
-        output.appendChild(resultLine);
-    }
-
-    // Scroll to bottom
-    window.scrollTo(0, document.body.scrollHeight);
 }
 
-// Handle input
+// Handle keyboard input
 input.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
         const command = input.value;
         processCommand(command);
         input.value = '';
+    } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (historyIndex < commandHistory.length - 1) {
+            historyIndex++;
+            input.value = commandHistory[historyIndex];
+        }
+    } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (historyIndex > 0) {
+            historyIndex--;
+            input.value = commandHistory[historyIndex];
+        } else {
+            historyIndex = -1;
+            input.value = '';
+        }
     }
 });
 
-// Initialize
-showWelcome();
+// Keep input focused
+document.addEventListener('click', () => {
+    input.focus();
+});
+
+// Initialize - Load data then start terminal
+loadData();
 input.focus();
