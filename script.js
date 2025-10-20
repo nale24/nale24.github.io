@@ -34,13 +34,13 @@ const commands = {
 ║                    AVAILABLE COMMANDS                      ║
 ╚════════════════════════════════════════════════════════════╝
 
-  about      - Learn more about me and my background
-  timeline   - View my education and work experience
-  skills     - See my technical skills and expertise
-  projects   - Browse my portfolio projects
-  contact    - Get my contact information
-  clear      - Clear the terminal screen
-  help       - Show this help message
+  about      - Learn more about me and my background \n
+  timeline   - View my education and work experience \n
+  skills     - See my technical skills and expertise \n
+  projects   - Browse my portfolio projects \n
+  contact    - Get my contact information \n
+  clear      - Clear the terminal screen \n
+  help       - Show this help message \n
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
