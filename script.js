@@ -210,7 +210,9 @@ function processCommand(cmd) {
     }
 
     // Clear previous output before showing new command
-    output.innerHTML = '';
+    // output.innerHTML = '';
+    // Echoing the command, then add a separator to make the website look like real terminal
+    addOutput('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
     // Echo command
     addOutput(`visitor@portfolio:~$ ${cmd}`, 'command-echo');
@@ -225,6 +227,7 @@ function processCommand(cmd) {
         if (result) addOutput(result, 'error');
         return;
     }
+
 
     // Check if it's a valid command
     const command = trimmedCmd.toLowerCase();
