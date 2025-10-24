@@ -195,7 +195,7 @@ function addOutput(text, className = '') {
     // Use innerText to preserve line breaks and whitespace
     line.innerText = text;
     // Make sure white-space is preserved in CSS
-    line.style.whiteSpace = 'pre-wrap';
+    line.style.whiteSpace = 'pre';
     output.appendChild(line);
     output.scrollTop = output.scrollHeight;
 }

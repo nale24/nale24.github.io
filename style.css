@@ -30,12 +30,14 @@ body {
 #output {
     margin-bottom: 20px;
     min-height: 400px;
+    overflow-x: auto; /* Add this: enables horizontal scroll on overflow */
+    white-space: pre; /* Change from pre-wrap to pre: preserves whitespace without wrapping */
 }
 
 .output-line {
     margin: 8px 0;
     line-height: 1.6;
-    white-space: pre-wrap; /* This is critical! */
+    white-space: pre; /* Update this too for consistency */
 }
 
 .input-line {
@@ -80,7 +82,29 @@ a:hover {
     text-decoration: underline;
 }
 
+
 @media (max-width: 768px) {
-    .terminal { padding: 10px; }
-    .input-line { flex-direction: column; align-items: flex-start; }
+    body {
+        padding: 10px; /* Reduce body padding for more screen space */
+    }
+
+    .terminal {
+        max-width: 100%; /* Full width on mobile */
+        padding: 15px; /* Slightly less padding */
+        border-radius: 4px; /* Softer corners for mobile */
+    }
+
+    #output, .output-line, #command-input {
+        font-size: 14px; /* Smaller font to fit more content without overflow */
+    }
+
+    .input-line {
+        gap: 5px; /* Tighter spacing */
+    }
+}
+
+@media (max-width: 480px) {
+    #output, .output-line, #command-input {
+        font-size: 12px; /* Even smaller for very narrow devices */
+    }
 }
